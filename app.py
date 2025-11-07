@@ -5,12 +5,8 @@ import librosa
 import librosa.display
 import matplotlib.pyplot as plt
 import joblib
-import os
-from feature_extractor import GTZANFeatureExtractor  # <-- your custom class
+from feature_extractor import GTZANFeatureExtractor
 
-# ---------------------------
-# Streamlit Page Setup
-# ---------------------------
 st.set_page_config(page_title="🎵 GTZAN Genre Classifier", layout="wide")
 
 st.title("🎧 GTZAN Music Genre Classification")
@@ -42,9 +38,7 @@ st.write("")  # 1 line space
 st.write("")  # 2 line space
 st.markdown("Upload a **.wav** file to visualize its waveform, spectrogram, predicted genre, and probabilities.")
 
-# ---------------------------
-# Load pipeline and mapping
-# ---------------------------
+
 @st.cache_resource
 def load_pipeline():
     return joblib.load(r'Pipelines/final_pipeline.pkl')
@@ -57,9 +51,7 @@ def load_mapping():
 genre_pipeline = load_pipeline()
 genre_mapping = load_mapping()
 
-# ---------------------------
-# File upload
-# ---------------------------
+
 uploaded_file = st.file_uploader("🎵 Upload a music file (.wav)", type=["wav"])
 
 if uploaded_file is not None:
@@ -70,9 +62,7 @@ if uploaded_file is not None:
     with open(temp_path, "wb") as f:
         f.write(uploaded_file.read())
 
-    # ---------------------------
-    # Audio Visualization
-    # ---------------------------
+
     y, sr = librosa.load(temp_path, duration=30)
 
     st.subheader("🎶 Audio Waveform and Spectrogram")
@@ -98,9 +88,7 @@ if uploaded_file is not None:
         fig.colorbar(img, ax=ax, format="%+2.f dB")
         st.pyplot(fig)
 
-    # ---------------------------
-    # Prediction Section
-    # ---------------------------
+
     try:
         pred = genre_pipeline.predict([temp_path])[0]
         predicted_genre = genre_mapping.get(pred, str(pred))
@@ -121,9 +109,7 @@ if uploaded_file is not None:
     top3_df = top3_df.set_index("Genre")
     st.bar_chart(top3_df)
 
-    # ---------------------------
-    # Feature Extraction Display
-    # ---------------------------
+
     st.subheader("📋 Extracted Audio Features (58 values)")
 
     try:
